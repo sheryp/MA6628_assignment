@@ -1,0 +1,57 @@
+import numpy as np
+import scipy.stats as ss
+import time 
+import math
+
+def d1f(St, K, t, T, r, sigma):
+    ''' Black-Scholes-Merton d1 function.
+        Parameters see e.g. BSM_call_value function. '''
+    d1 = (math.log(St / K) + (r + 0.5 * sigma ** 2)
+          * (T - t)) / (sigma * math.sqrt(T - t))
+    return d1
+    
+def BSM_call_value(St, K, t, T, r, sigma):
+    d1 = d1f(St, K, t, T, r, sigma)
+    d2 = d1 - sigma * math.sqrt(T - t)
+    call_value = St * ss.norm.cdf(d1) - math.exp(-r * (T - t)) * K * ss.norm.cdf(d2)
+    return call_value
+    
+#apply the assignment4‘s data here
+Today = np.datetime64('2018-09-27')
+Maturity = np.datetime64('2018-12-31')
+T = (Maturity - Today)/np.timedelta64(1,'D')/365 #time to maturity in year
+S0 = 290.68
+K = 288.
+r = .02
+Call = 9.23
+Otype='C' #Call
+
+#If the volatility is 30%
+sigma = 0.30
+
+#print the answer with given sigma
+print('If the volatility is 30%, we can calculate the call value is', BSM_call_value(S0, K, 0, T, r, sigma))
+
+#Compute the implied volatility.
+def IVolBsm(S0, K, T, r, call):
+    """
+    Inputs:
+        S0: spot price
+        K: strike
+        T: time to maturity in year
+        r: rate
+        Call: market price
+    Outputs:
+        Implied volatility
+    """
+    InitVol = .3
+    error = lambda sigma: (BSM_call_value(S0, K, 0, T, r, sigma) - Call)**2
+    opt = optimize.fmin(error, InitVol);
+    return opt[0]
+
+if __name__ == "__main__":
+    print('Implied volatility is', IVolBsm(S0, K, T, r, Call))
+    
+#check
+BSM_call_value(S0, K, 0, T, r, 0.11824219)
+#when volatility = 11.824219%， BSM call price = market call price
