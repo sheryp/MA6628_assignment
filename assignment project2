@@ -34,4 +34,4 @@ BSM_call_value(S0, K, 0, T, r_hat, sigma_hat)
 
 #GAC price
 GAC = math.exp((r_hat -r)*T)*BSM_call_value(S0, K, 0, T, r_hat, sigma_hat)
-print('The BSM asian option value is', GAC)
+print('The BSM asian option value is ', GAC)
